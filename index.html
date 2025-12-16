@@ -3,56 +3,136 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MRR Calculator (Disc A vs Disc B)</title>
+  <title>AL TAHER | MRR Calculator</title>
   <style>
-    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    body { margin: 0; background:#0b0f17; color:#eaf0ff; }
+    :root{
+      --bg: #f5f6f8;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --red: #e11d2e;
+      --shadow: 0 10px 25px rgba(17,24,39,0.06);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    body { margin:0; background:var(--bg); color:var(--text); }
     .wrap { max-width: 980px; margin: 0 auto; padding: 22px; }
-    h1 { margin: 0 0 6px; font-size: 22px; }
-    .sub { margin: 0 0 16px; color:#b8c4e6; }
+
+    /* Header */
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px; background: var(--card);
+      border:1px solid var(--border); border-radius: 16px;
+      padding: 14px 16px; box-shadow: var(--shadow);
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .brand{ display:flex; align-items:center; gap:12px; min-width: 0; }
+    .brand img{ height: 46px; width:auto; display:block; }
+    .titles{ line-height:1.15; min-width:0; }
+    .name{ font-weight:800; letter-spacing:0.5px; color: var(--red); }
+    .tag{ font-size:12px; color: var(--muted); margin-top:2px; }
+    .site a{
+      font-size:12px;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(107,114,128,0.6);
+      padding-bottom: 2px;
+    }
+    .site a:hover{ color: var(--red); border-bottom-color: rgba(225,29,46,0.6); }
+
+    h1 { margin: 10px 0 6px; font-size: 22px; }
+    .sub { margin: 0 0 16px; color: var(--muted); }
+
     .grid { display:grid; grid-template-columns: 1fr; gap: 12px; }
     @media (min-width: 900px){ .grid { grid-template-columns: 1fr 1fr; } }
-    .card { background:#121a2b; border:1px solid #233055; border-radius:14px; padding:14px; }
-    .card h2 { margin: 0 0 10px; font-size: 16px; }
-    label { display:block; font-size:12px; color:#b8c4e6; margin-bottom:6px; }
-    input, select {
+
+    .card{
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      box-shadow: var(--shadow);
+    }
+    .card h2{ margin:0 0 10px; font-size: 15px; }
+
+    label{ display:block; font-size:12px; color: var(--muted); margin-bottom:6px; }
+
+    input, select{
       width:100%; box-sizing:border-box; padding:10px;
-      border-radius:10px; border:1px solid #2a3a66;
-      background:#0c1222; color:#eaf0ff; outline:none;
+      border-radius:12px; border:1px solid var(--border);
+      background:#ffffff; color: var(--text); outline:none;
     }
-    input:focus, select:focus { border-color:#6aa7ff; }
-    .row { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
-    @media (max-width: 700px){ .row { grid-template-columns: 1fr; } }
-    .out {
-      margin-top: 12px; background:#0c1222; border:1px solid #233055;
-      border-radius:12px; padding:12px;
+    input:focus, select:focus{
+      border-color: rgba(225,29,46,0.7);
+      box-shadow: 0 0 0 4px rgba(225,29,46,0.10);
     }
-    .kpis { display:grid; grid-template-columns: 1fr; gap:10px; }
-    @media (min-width: 700px){ .kpis { grid-template-columns: 1fr 1fr 1fr; } }
-    .k { background:#101a33; border:1px solid #233055; border-radius:12px; padding:10px; }
-    .t { font-size:12px; color:#b8c4e6; }
-    .v { font-size:18px; margin-top:4px; }
-    .msg { margin-top:10px; font-size:12px; }
-    .err { color:#ff9aa8; }
-    .ok { color:#9dffb2; }
-    .tiny { color:#b8c4e6; font-size:12px; margin-top:10px; line-height:1.35; }
-    code { color:#cfe3ff; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { padding: 10px; border-bottom: 1px solid #233055; text-align: left; font-size: 13px; vertical-align: top; }
-    th { color:#b8c4e6; font-weight: 600; }
-    .muted { color:#b8c4e6; font-size: 12px; margin-top: 6px; line-height: 1.35; }
+
+    .row{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
+    @media (max-width: 700px){ .row{ grid-template-columns: 1fr; } }
+
+    .out{
+      margin-top: 12px;
+      background: #fafafa;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .kpis{ display:grid; grid-template-columns: 1fr; gap:10px; }
+    @media (min-width: 700px){ .kpis{ grid-template-columns: 1fr 1fr 1fr; } }
+
+    .k{
+      background:#ffffff;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:10px;
+    }
+    .t{ font-size:12px; color: var(--muted); }
+    .v{ font-size:18px; margin-top:4px; }
+    .v.accent{ color: var(--red); font-weight:800; }
+
+    .msg{ margin-top:10px; font-size:12px; }
+    .err{ color: #b91c1c; }
+    .ok{ color: #15803d; }
+
+    .tiny{ color: var(--muted); font-size:12px; margin-top:10px; line-height:1.35; }
+    code{ color: var(--red); font-weight:700; background: rgba(225,29,46,0.06); padding: 1px 6px; border-radius: 8px; }
+
+    table{ width:100%; border-collapse: collapse; margin-top:10px; }
+    th, td{ padding: 10px; border-bottom:1px solid var(--border); text-align:left; font-size:13px; vertical-align:top; }
+    th{ color: var(--muted); font-weight:700; }
+
+    .muted{ color: var(--muted); font-size:12px; margin-top:6px; line-height:1.35; }
   </style>
 </head>
 
 <body>
   <div class="wrap">
+
+    <!-- Header with logo + website -->
+    <div class="topbar">
+      <div class="brand">
+        <!-- Put al-taher-logo.png in the same folder as this HTML -->
+        <img src="al-taher-logo.png" alt="AL TAHER logo">
+        <div class="titles">
+          <div class="name">AL TAHER</div>
+          <div class="tag">MRR Calculator & Annual Labour Saving</div>
+        </div>
+      </div>
+      <div class="site">
+        <a href="https://altaherchemicals.com" target="_blank" rel="noopener">altaherchemicals.com</a>
+      </div>
+    </div>
+
     <h1>MRR Calculator (g/min)</h1>
     <p class="sub">MRR = (Material Removed) ÷ Time (minutes)</p>
 
-    <!-- MRR INPUTS (material removed + time as inputs) -->
+    <!-- MRR INPUTS -->
     <div class="grid">
       <div class="card">
-        <h2>Disc A (Inputs)</h2>
+        <h2>Disc A</h2>
         <div class="row">
           <div>
             <label>Material removed (g)</label>
@@ -70,15 +150,15 @@
 
         <div class="out">
           <div class="kpis">
-            <div class="k"><div class="t">MRR (g/min)</div><div class="v" id="a_mrr">—</div></div>
+            <div class="k"><div class="t">MRR (g/min)</div><div class="v accent" id="a_mrr">—</div></div>
             <div class="k"><div class="t">Status</div><div class="v" id="a_status">—</div></div>
-            <div class="k"><div class="t">MRR note</div><div class="v" style="font-size:13px;color:#b8c4e6;">Material ÷ Time</div></div>
+            <div class="k"><div class="t">MRR note</div><div class="v" style="font-size:13px;color:var(--muted);">Material ÷ Time</div></div>
           </div>
         </div>
       </div>
 
       <div class="card">
-        <h2>Disc B (Inputs)</h2>
+        <h2>Disc B</h2>
         <div class="row">
           <div>
             <label>Material removed (g)</label>
@@ -96,9 +176,9 @@
 
         <div class="out">
           <div class="kpis">
-            <div class="k"><div class="t">MRR (g/min)</div><div class="v" id="b_mrr">—</div></div>
+            <div class="k"><div class="t">MRR (g/min)</div><div class="v accent" id="b_mrr">—</div></div>
             <div class="k"><div class="t">Status</div><div class="v" id="b_status">—</div></div>
-            <div class="k"><div class="t">MRR note</div><div class="v" style="font-size:13px;color:#b8c4e6;">Material ÷ Time</div></div>
+            <div class="k"><div class="t">MRR note</div><div class="v" style="font-size:13px;color:var(--muted);">Material ÷ Time</div></div>
           </div>
         </div>
       </div>
@@ -109,7 +189,7 @@
       <h2>Comparison</h2>
       <div class="out">
         <div class="kpis">
-          <div class="k"><div class="t">A ÷ B (Speed ratio)</div><div class="v" id="ratio">—</div></div>
+          <div class="k"><div class="t">A ÷ B (Speed ratio)</div><div class="v accent" id="ratio">—</div></div>
           <div class="k"><div class="t">Faster disc</div><div class="v" id="faster">—</div></div>
           <div class="k"><div class="t">Difference (A − B) g/min</div><div class="v" id="diff">—</div></div>
         </div>
@@ -121,7 +201,7 @@
       </div>
     </div>
 
-    <!-- Labour Cost Saving (ANNUAL-BASED) -->
+    <!-- Labour Cost Saving -->
     <div class="card" style="margin-top:12px;">
       <h2>Labour Cost Saving (Annual-based)</h2>
 
@@ -184,7 +264,7 @@
             <tr><td>Annual working hours (hrs/year)</td><td id="annual_hours">—</td></tr>
             <tr><td>Grinding hours/year (after utilisation)</td><td id="grinding_hours">—</td></tr>
             <tr><td>Hourly labour rate (AED/hr)</td><td id="hourly_rate">—</td></tr>
-            <tr><td><b>Estimated annual labour savings (AED/year)</b></td><td id="annual_saving">—</td></tr>
+            <tr><td><b>Estimated annual labour savings (AED/year)</b></td><td><b id="annual_saving">—</b></td></tr>
             <tr><td class="muted">Basis</td><td class="muted" id="basis_note">—</td></tr>
           </tbody>
         </table>
@@ -219,16 +299,10 @@
   }
 
   function calcMRR(removedG, timeMin){
-    if (!Number.isFinite(removedG) || !Number.isFinite(timeMin)) {
-      return { ok:false, mrr:NaN, msg:"Enter numbers in all fields." };
-    }
-    if (removedG < 0) {
-      return { ok:false, mrr:NaN, msg:"Material removed cannot be negative." };
-    }
-    if (timeMin <= 0) {
-      return { ok:false, mrr:NaN, msg:"Time must be > 0." };
-    }
-    return { ok:true, mrr: removedG / timeMin, msg:"OK" };
+    if (!Number.isFinite(removedG) || !Number.isFinite(timeMin)) return { ok:false, mrr:NaN };
+    if (removedG < 0) return { ok:false, mrr:NaN };
+    if (timeMin <= 0) return { ok:false, mrr:NaN };
+    return { ok:true, mrr: removedG / timeMin };
   }
 
   function syncSalaryUI(){
@@ -267,7 +341,6 @@
   }
 
   function update(){
-    // Inputs (material removed + time)
     const aRemoved = toNum("a_removed_in");
     const aTime = toNum("a_time_in");
     const bRemoved = toNum("b_removed_in");
@@ -276,19 +349,17 @@
     const A = calcMRR(aRemoved, aTime);
     const B = calcMRR(bRemoved, bTime);
 
-    // Labels
     const labA = ($("a_label").value || "Disc A").trim();
     const labB = ($("b_label").value || "Disc B").trim();
 
-    $("a_mrr").textContent     = fmt(A.mrr, 2);
+    $("a_mrr").textContent = fmt(A.mrr, 2);
     $("a_status").textContent  = A.ok ? "OK" : "Check";
-    $("a_status").style.color  = A.ok ? "#9dffb2" : "#ff9aa8";
+    $("a_status").style.color  = A.ok ? "var(--red)" : "#b91c1c";
 
-    $("b_mrr").textContent     = fmt(B.mrr, 2);
+    $("b_mrr").textContent = fmt(B.mrr, 2);
     $("b_status").textContent  = B.ok ? "OK" : "Check";
-    $("b_status").style.color  = B.ok ? "#9dffb2" : "#ff9aa8";
+    $("b_status").style.color  = B.ok ? "var(--red)" : "#b91c1c";
 
-    // Comparison
     const ratio = (Number.isFinite(A.mrr) && Number.isFinite(B.mrr) && B.mrr > 0) ? (A.mrr / B.mrr) : NaN;
     $("ratio").textContent = Number.isFinite(ratio) ? (fmt(ratio, 2) + "×") : "—";
 
@@ -303,7 +374,6 @@
     }
     $("faster").textContent = faster;
 
-    // Message
     const msgEl = $("msg");
     if (!A.ok || !B.ok){
       msgEl.className = "msg err";
@@ -313,7 +383,6 @@
       msgEl.textContent = "Calculated automatically as you type.";
     }
 
-    // ---- Labour savings (ANNUAL-BASED) ----
     const { netHoursDay, annualHours, grindingHours } = computeHours();
     $("net_hours_day").value = Number.isFinite(netHoursDay) ? (fmt(netHoursDay, 2) + " hrs/day") : "—";
     $("annual_hours").textContent = Number.isFinite(annualHours) ? fmt(annualHours, 0) : "—";
@@ -330,9 +399,9 @@
         Number.isFinite(grindingHours) && grindingHours > 0 &&
         Number.isFinite(hourlyRate) && hourlyRate >= 0) {
 
-      const materialYear_g = B.mrr * (grindingHours * 60);          // g/year
-      const timeA_hours = materialYear_g / (A.mrr * 60);            // hr/year to remove same material
-      const savedHours = grindingHours - timeA_hours;               // hr/year saved
+      const materialYear_g = B.mrr * (grindingHours * 60);
+      const timeA_hours = materialYear_g / (A.mrr * 60);
+      const savedHours = grindingHours - timeA_hours;
 
       annualSaving = savedHours * hourlyRate;
 
@@ -343,7 +412,6 @@
     $("basis_note").textContent = basis;
   }
 
-  // listeners
   [
     "a_removed_in","a_time_in","a_label",
     "b_removed_in","b_time_in","b_label",
@@ -354,10 +422,10 @@
 
   $("salary_type").addEventListener("change", () => { syncSalaryUI(); update(); });
 
-  // init
   syncSalaryUI();
   update();
 </script>
 </body>
 </html>
+
 
