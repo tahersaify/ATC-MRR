@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MRR Calculator (Disc A vs Disc B)</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body { margin: 0; background:#0b0f17; color:#eaf0ff; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 22px; }
+    h1 { margin: 0 0 6px; font-size: 22px; }
+    .sub { margin: 0 0 16px; color:#b8c4e6; }
+    .grid { display:grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 900px){ .grid { grid-template-columns: 1fr 1fr; } }
+    .card { background:#121a2b; border:1px solid #233055; border-radius:14px; padding:14px; }
+    .card h2 { margin: 0 0 10px; font-size: 16px; }
+    label { display:block; font-size:12px; color:#b8c4e6; margin-bottom:6px; }
+    input, select {
+      width:100%; box-sizing:border-box; padding:10px;
+      border-radius:10px; border:1px solid #2a3a66;
+      background:#0c1222; color:#eaf0ff; outline:none;
+    }
+    input:focus, select:focus { border-color:#6aa7ff; }
+    .row { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
+    @media (max-width: 700px){ .row { grid-template-columns: 1fr; } }
+    .out {
+      margin-top: 12px; background:#0c1222; border:1px solid #233055;
+      border-radius:12px; padding:12px;
+    }
+    .kpis { display:grid; grid-template-columns: 1fr; gap:10px; }
+    @media (min-width: 700px){ .kpis { grid-template-columns: 1fr 1fr 1fr; } }
+    .k { background:#101a33; border:1px solid #233055; border-radius:12px; padding:10px; }
+    .t { font-size:12px; color:#b8c4e6; }
+    .v { font-size:18px; margin-top:4px; }
+    .msg { margin-top:10px; font-size:12px; }
+    .err { color:#ff9aa8; }
+    .ok { color:#9dffb2; }
+    .tiny { color:#b8c4e6; font-size:12px; margin-top:10px; line-height:1.35; }
+    code { color:#cfe3ff; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 10px; border-bottom: 1px solid #233055; text-align: left; font-size: 13px; vertical-align: top; }
+    th { color:#b8c4e6; font-weight: 600; }
+    .muted { color:#b8c4e6; font-size: 12px; margin-top: 6px; line-height: 1.35; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>MRR Calculator (g/min)</h1>
+    <p class="sub">MRR = (Material Removed) ÷ Time (minutes)</p>
+
+    <!-- MRR INPUTS (material removed + time as inputs) -->
+    <div class="grid">
+      <div class="card">
+        <h2>Disc A (Inputs)</h2>
+        <div class="row">
+          <div>
+            <label>Material removed (g)</label>
+            <input id="a_removed_in" type="number" step="0.001" value="187">
+          </div>
+          <div>
+            <label>Time worked (min)</label>
+            <input id="a_time_in" type="number" step="0.001" value="5">
+          </div>
+          <div>
+            <label>Disc A label (optional)</label>
+            <input id="a_label" type="text" value="Disc A">
+          </div>
+        </div>
+
+        <div class="out">
+          <div class="kpis">
+            <div class="k"><div class="t">MRR (g/min)</div><div class="v" id="a_mrr">—</div></div>
+            <div class="k"><div class="t">Status</div><div class="v" id="a_status">—</div></div>
+            <div class="k"><div class="t">MRR note</div><div class="v" style="font-size:13px;color:#b8c4e6;">Material ÷ Time</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Disc B (Inputs)</h2>
+        <div class="row">
+          <div>
+            <label>Material removed (g)</label>
+            <input id="b_removed_in" type="number" step="0.001" value="63">
+          </div>
+          <div>
+            <label>Time worked (min)</label>
+            <input id="b_time_in" type="number" step="0.001" value="5">
+          </div>
+          <div>
+            <label>Disc B label (optional)</label>
+            <input id="b_label" type="text" value="Disc B">
+          </div>
+        </div>
+
+        <div class="out">
+          <div class="kpis">
+            <div class="k"><div class="t">MRR (g/min)</div><div class="v" id="b_mrr">—</div></div>
+            <div class="k"><div class="t">Status</div><div class="v" id="b_status">—</div></div>
+            <div class="k"><div class="t">MRR note</div><div class="v" style="font-size:13px;color:#b8c4e6;">Material ÷ Time</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison -->
+    <div class="card" style="margin-top:12px;">
+      <h2>Comparison</h2>
+      <div class="out">
+        <div class="kpis">
+          <div class="k"><div class="t">A ÷ B (Speed ratio)</div><div class="v" id="ratio">—</div></div>
+          <div class="k"><div class="t">Faster disc</div><div class="v" id="faster">—</div></div>
+          <div class="k"><div class="t">Difference (A − B) g/min</div><div class="v" id="diff">—</div></div>
+        </div>
+        <div id="msg" class="msg"></div>
+      </div>
+
+      <div class="tiny">
+        Formula used: <code>MRR = Material Removed / Time</code> (per minute)
+      </div>
+    </div>
+
+    <!-- Labour Cost Saving (ANNUAL-BASED) -->
+    <div class="card" style="margin-top:12px;">
+      <h2>Labour Cost Saving (Annual-based)</h2>
+
+      <div class="row">
+        <div>
+          <label>Salary type</label>
+          <select id="salary_type">
+            <option value="monthly" selected>Monthly salary (AED/month)</option>
+            <option value="hourly">Hourly wage (AED/hour)</option>
+          </select>
+        </div>
+        <div>
+          <label id="salary_label">Monthly salary (AED)</label>
+          <input id="salary_value" type="number" step="1" value="2500">
+          <div class="muted">Hourly rate is computed using your work schedule below (or direct if hourly).</div>
+        </div>
+        <div>
+          <label>Grinding utilisation (%)</label>
+          <input id="util_percent" type="number" step="1" value="100">
+          <div class="muted">If grinding is only part of the job, put e.g. 30%</div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div>
+          <label>Work start</label>
+          <input id="work_start" type="time" value="08:00">
+        </div>
+        <div>
+          <label>Work end</label>
+          <input id="work_end" type="time" value="18:00">
+        </div>
+        <div>
+          <label>Lunch break (hours)</label>
+          <input id="lunch_hours" type="number" step="0.25" value="1">
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div>
+          <label>Working days/week</label>
+          <input id="days_per_week" type="number" step="1" value="6">
+        </div>
+        <div>
+          <label>Working weeks/year</label>
+          <input id="weeks_per_year" type="number" step="1" value="52">
+        </div>
+        <div>
+          <label>Computed net hours/day</label>
+          <input id="net_hours_day" type="text" disabled value="—">
+        </div>
+      </div>
+
+      <div class="out">
+        <table>
+          <thead>
+            <tr><th>Result</th><th>Value</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Annual working hours (hrs/year)</td><td id="annual_hours">—</td></tr>
+            <tr><td>Grinding hours/year (after utilisation)</td><td id="grinding_hours">—</td></tr>
+            <tr><td>Hourly labour rate (AED/hr)</td><td id="hourly_rate">—</td></tr>
+            <tr><td><b>Estimated annual labour savings (AED/year)</b></td><td id="annual_saving">—</td></tr>
+            <tr><td class="muted">Basis</td><td class="muted" id="basis_note">—</td></tr>
+          </tbody>
+        </table>
+
+        <div class="muted">
+          Basis: assumes Disc B runs for your grinding hours/year. We compute how many hours Disc A would need to remove the same material, and the difference is your saved hours/year.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  function toNum(id){
+    const v = parseFloat($(id).value);
+    return Number.isFinite(v) ? v : NaN;
+  }
+
+  function fmt(n, d=2){
+    if (!Number.isFinite(n)) return "—";
+    const p = 10 ** d;
+    return (Math.round(n * p) / p).toFixed(d);
+  }
+
+  function timeToMinutes(hhmm){
+    if (!hhmm || typeof hhmm !== "string" || !hhmm.includes(":")) return NaN;
+    const [h,m] = hhmm.split(":").map(x => parseInt(x,10));
+    if (!Number.isFinite(h) || !Number.isFinite(m)) return NaN;
+    return h*60 + m;
+  }
+
+  function calcMRR(removedG, timeMin){
+    if (!Number.isFinite(removedG) || !Number.isFinite(timeMin)) {
+      return { ok:false, mrr:NaN, msg:"Enter numbers in all fields." };
+    }
+    if (removedG < 0) {
+      return { ok:false, mrr:NaN, msg:"Material removed cannot be negative." };
+    }
+    if (timeMin <= 0) {
+      return { ok:false, mrr:NaN, msg:"Time must be > 0." };
+    }
+    return { ok:true, mrr: removedG / timeMin, msg:"OK" };
+  }
+
+  function syncSalaryUI(){
+    const t = $("salary_type").value;
+    $("salary_label").textContent = (t === "hourly") ? "Hourly wage (AED/hr)" : "Monthly salary (AED)";
+  }
+
+  function computeHours(){
+    const startMin = timeToMinutes($("work_start").value);
+    const endMin   = timeToMinutes($("work_end").value);
+    const lunchH   = toNum("lunch_hours");
+    const dpw      = toNum("days_per_week");
+    const wpy      = toNum("weeks_per_year");
+    const utilP    = toNum("util_percent");
+
+    const grossMin = endMin - startMin;
+    const netMin = grossMin - (lunchH * 60);
+
+    const netHoursDay = (grossMin > 0 && netMin > 0) ? (netMin / 60) : NaN;
+    const annualHours = (Number.isFinite(netHoursDay) && dpw > 0 && wpy > 0) ? (netHoursDay * dpw * wpy) : NaN;
+    const grindingHours = (Number.isFinite(annualHours) && Number.isFinite(utilP) && utilP >= 0) ? (annualHours * utilP / 100) : NaN;
+
+    return { netHoursDay, annualHours, grindingHours };
+  }
+
+  function computeHourlyRate(annualHours){
+    const type = $("salary_type").value;
+    const val = toNum("salary_value");
+
+    if (type === "hourly"){
+      return (Number.isFinite(val) && val >= 0) ? val : NaN;
+    }
+    if (!Number.isFinite(val) || val < 0 || !Number.isFinite(annualHours) || annualHours <= 0) return NaN;
+    const annualSalary = val * 12;
+    return annualSalary / annualHours;
+  }
+
+  function update(){
+    // Inputs (material removed + time)
+    const aRemoved = toNum("a_removed_in");
+    const aTime = toNum("a_time_in");
+    const bRemoved = toNum("b_removed_in");
+    const bTime = toNum("b_time_in");
+
+    const A = calcMRR(aRemoved, aTime);
+    const B = calcMRR(bRemoved, bTime);
+
+    // Labels
+    const labA = ($("a_label").value || "Disc A").trim();
+    const labB = ($("b_label").value || "Disc B").trim();
+
+    $("a_mrr").textContent     = fmt(A.mrr, 2);
+    $("a_status").textContent  = A.ok ? "OK" : "Check";
+    $("a_status").style.color  = A.ok ? "#9dffb2" : "#ff9aa8";
+
+    $("b_mrr").textContent     = fmt(B.mrr, 2);
+    $("b_status").textContent  = B.ok ? "OK" : "Check";
+    $("b_status").style.color  = B.ok ? "#9dffb2" : "#ff9aa8";
+
+    // Comparison
+    const ratio = (Number.isFinite(A.mrr) && Number.isFinite(B.mrr) && B.mrr > 0) ? (A.mrr / B.mrr) : NaN;
+    $("ratio").textContent = Number.isFinite(ratio) ? (fmt(ratio, 2) + "×") : "—";
+
+    const diff = (Number.isFinite(A.mrr) && Number.isFinite(B.mrr)) ? (A.mrr - B.mrr) : NaN;
+    $("diff").textContent = fmt(diff, 2);
+
+    let faster = "—";
+    if (Number.isFinite(A.mrr) && Number.isFinite(B.mrr)) {
+      if (A.mrr > B.mrr) faster = labA;
+      else if (B.mrr > A.mrr) faster = labB;
+      else faster = "Same";
+    }
+    $("faster").textContent = faster;
+
+    // Message
+    const msgEl = $("msg");
+    if (!A.ok || !B.ok){
+      msgEl.className = "msg err";
+      msgEl.textContent = "Fix input errors above (time > 0, removed ≥ 0).";
+    } else {
+      msgEl.className = "msg ok";
+      msgEl.textContent = "Calculated automatically as you type.";
+    }
+
+    // ---- Labour savings (ANNUAL-BASED) ----
+    const { netHoursDay, annualHours, grindingHours } = computeHours();
+    $("net_hours_day").value = Number.isFinite(netHoursDay) ? (fmt(netHoursDay, 2) + " hrs/day") : "—";
+    $("annual_hours").textContent = Number.isFinite(annualHours) ? fmt(annualHours, 0) : "—";
+    $("grinding_hours").textContent = Number.isFinite(grindingHours) ? fmt(grindingHours, 0) : "—";
+
+    const hourlyRate = computeHourlyRate(annualHours);
+    $("hourly_rate").textContent = fmt(hourlyRate, 2);
+
+    let annualSaving = NaN;
+    let basis = "—";
+
+    if (Number.isFinite(A.mrr) && A.mrr > 0 &&
+        Number.isFinite(B.mrr) && B.mrr > 0 &&
+        Number.isFinite(grindingHours) && grindingHours > 0 &&
+        Number.isFinite(hourlyRate) && hourlyRate >= 0) {
+
+      const materialYear_g = B.mrr * (grindingHours * 60);          // g/year
+      const timeA_hours = materialYear_g / (A.mrr * 60);            // hr/year to remove same material
+      const savedHours = grindingHours - timeA_hours;               // hr/year saved
+
+      annualSaving = savedHours * hourlyRate;
+
+      basis = `${labB} yearly material ≈ ${fmt(materialYear_g/1000,1)} kg/year (in ${fmt(grindingHours,0)} grinding hrs). ${labA} needs ${fmt(timeA_hours,1)} hrs → saves ${fmt(savedHours,1)} hrs/year.`;
+    }
+
+    $("annual_saving").textContent = Number.isFinite(annualSaving) ? fmt(annualSaving, 0) : "—";
+    $("basis_note").textContent = basis;
+  }
+
+  // listeners
+  [
+    "a_removed_in","a_time_in","a_label",
+    "b_removed_in","b_time_in","b_label",
+    "salary_type","salary_value","util_percent",
+    "work_start","work_end","lunch_hours",
+    "days_per_week","weeks_per_year"
+  ].forEach(id => $(id).addEventListener("input", update));
+
+  $("salary_type").addEventListener("change", () => { syncSalaryUI(); update(); });
+
+  // init
+  syncSalaryUI();
+  update();
+</script>
+</body>
+</html>
